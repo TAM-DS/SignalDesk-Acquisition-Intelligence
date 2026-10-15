@@ -6,6 +6,12 @@ An SDR research and draft-review workspace built around source review, explicit 
 
 A local, single-user prototype with seven fictional demonstration leads plus optional live OpenAI web research and drafting for user-entered leads. Delivery is always simulated. Automated tests use mocked provider responses. A user-operated live run also completed successfully; one example does not establish research accuracy or sales results. See the validation record for observed results and limits.
 
+## Product walkthrough
+
+![SignalDesk dashboard showing a fictional lead, source evidence, and an approved draft](docs/images/01-dashboard.png)
+
+*Fictional Meridian Field Services demo: review queue, decision counts, source evidence, and an approved draft. Counts reflect a local test workspace; delivery remains simulated.*
+
 ## The business problem
 
 A fast outreach draft is not useful if it invents a relationship, misidentifies a contact, or ignores a decision not to contact someone. SignalDesk makes research, evidence gaps, draft review, and authorization visible in one local workflow.
