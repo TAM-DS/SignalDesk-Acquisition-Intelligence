@@ -12,6 +12,18 @@ A local, single-user prototype with seven fictional demonstration leads plus opt
 
 *Fictional Meridian Field Services demo: review queue, decision counts, source evidence, and an approved draft. Counts reflect a local test workspace; delivery remains simulated.*
 
+### Evidence beside the draft
+
+![Meridian fictional demo showing source evidence, draft claim reference, and approved outreach](docs/images/02-evidence-review.png)
+
+*The selected Meridian fixture shows source M1 beside the draft and its claim reference. The approval event records the reviewed version; saving edits revokes approval. Other queue entries belong to the local test workspace and do not imply customer relationships or endorsements.*
+
+### Do Not Contact takes priority
+
+![Brightfield fictional demo with active Do Not Contact and disabled outreach controls](docs/images/03-do-not-contact.png)
+
+*Brightfield is a preloaded suppressed fixture. Potential business fit does not override Do Not Contact: approval and simulated delivery are blocked. Its empty decision history reflects the seeded state, not a newly recorded suppression action.*
+
 ## The business problem
 
 A fast outreach draft is not useful if it invents a relationship, misidentifies a contact, or ignores a decision not to contact someone. SignalDesk makes research, evidence gaps, draft review, and authorization visible in one local workflow.
