@@ -40,7 +40,7 @@ A fast outreach draft is not useful if it invents a relationship, misidentifies 
 
 **Evidence:** 40 automated tests passed locally; user-operated Mac checks confirmed the v0.3.1 label, saved-draft persistence, and persistent Do Not Contact. One observed live run completed. These are functional observations, not measured sales lift or a research-accuracy benchmark.
 
-[Architecture](docs/ARCHITECTURE.md) · [Validation](docs/VALIDATION.md) · [Product brief](docs/PRODUCT_BRIEF.md) · [Interview walkthrough](docs/INTERVIEW_WALKTHROUGH.md)
+[Architecture](docs/ARCHITECTURE.md) · [Validation](docs/VALIDATION.md) · [Product brief](docs/PRODUCT_BRIEF.md) · 
 
 ## Existing installation
 
