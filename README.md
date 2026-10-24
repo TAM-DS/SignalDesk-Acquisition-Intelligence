@@ -6,6 +6,16 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 ![SignalDesk SDR dashboard](docs/images/01-SignalDesk-SDR.png)
 
+## No surprise API bills. No uncontrolled research loops. No executive exceptions.
+
+**AI capability is not unlimited spending authority.** SignalDesk makes live Acquisition Intelligence research an explicit opt-in action, with a locally persisted allowance of **five attempts per UTC day, including failed attempts**. Once the allowance is exhausted, the application responds with HTTP `429` instead of launching another live research request. The human review queue remains accessible so work already completed can continue.
+
+This is a **request-count control, not a dollar budget or provider-side billing guarantee**. Individual requests may have different costs; API pricing and account billing are controlled by the provider. Review your provider usage dashboard and configure provider-side spending controls where available. Never interpret a `429` as permission to bypass the limit.
+
+*Research is bounded. Evidence is reviewable. Human authority is required before a company becomes an SDR lead.*
+
+
+
 ## Acquisition Intelligence — powered by OpenAI
 
 *Ten opportunities. The reasons behind them. The evidence to decide.*
