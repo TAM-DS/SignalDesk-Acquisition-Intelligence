@@ -1,4 +1,52 @@
-# SignalDesk v0.3.1
+# SignalDesk v0.4 — Acquisition Intelligence
+
+**OpenAI-powered company research. Evidence-linked recommendations. Human-governed decisions.**
+
+SignalDesk is a local, single-user B2B sales-development research and review application. OpenAI powers optional live company research and evidence-assisted drafting. The application enforces human review, Do Not Contact suppression, bounded API activity, and simulated-only delivery. **It does not autonomously send messages or authorize outreach.**
+
+![SignalDesk SDR dashboard](docs/images/01-SignalDesk-SDR.png)
+
+## Acquisition Intelligence — powered by OpenAI
+
+*Ten opportunities. The reasons behind them. The evidence to decide.*
+
+Acquisition Intelligence accepts a seller website, offering, and ideal customer profile, then optionally calls the OpenAI Responses API with web search. The bounded research returns company candidates, cautious fit explanations, links to provider-returned sources, and unknowns. **Citation provenance is checked; factual accuracy and company fit still require human verification.** Live research is opt-in and may incur API fees. The fictional preview makes no API calls.
+
+![OpenAI research identifying candidate companies](docs/images/08-Intelligence-Identifies-Candidate-Companies.png)
+
+![Save candidates for human review](docs/images/09-Save-For-For-Human_Review.png)
+
+### From recommendations to reviewable leads
+
+A candidate can be saved to the local review queue. A reviewer must inspect the supporting evidence and explicitly approve or reject the company. Creating a lead requires another confirmation plus a real contact or department and seller details. The handoff checks existing leads and Do Not Contact restrictions and creates only a `research_needed` record: **no automatic research call, draft approval, or delivery**.
+
+The interface and its controls:
+
+![Acquisition Intelligence research form](docs/images/04-SignalDesk-Acquistion-Intelligence-OpenAI.png)
+
+![OpenAI opt-in and built-in research interface](docs/images/05-AI-Intelligence-Builtin-SignalDesk.png)
+
+![Evidence-backed review interface](docs/images/06-Evidence-Backed-Review.png)
+
+![Full OpenAI-powered Acquisition Intelligence view](docs/images/07-Full-Powered-By-OpenAI.png)
+
+## SDR workspace — evidence before outreach
+
+Human reviewers can inspect fictional demonstration leads, trace supporting references, edit messages, approve an exact draft version, or reject and suppress outreach. Editing or new research invalidates prior approval. The **delivery action is simulated**, with no email-provider integration.
+
+![Evidence-grounded outreach draft — fictional demonstration](docs/images/02-SignalDesk-Outreach-Draft.png)
+
+![Human approval and simulated delivery — fictional demonstration](docs/images/03-SignalDesk-Delivery.png)
+
+## Safety and validation boundaries
+
+- The nine screenshots illustrate the UI and workflow. Some screens show **fictional examples**; live research screens show provider-returned recommendations, not independently verified customer facts.
+- The acquisition and SDR flows are designed for **local, single-user use**. There is no authentication, multi-tenant security, or production-ready deployment.
+- The acquisition adapter accepts only URLs found in provider citation annotations or web-search source metadata. A matched source reference does **not** prove the claims it accompanies.
+- Automated tests use mocked provider interactions; a successful live run demonstrates integration behavior, **not qualification accuracy or business outcomes**.
+- A verified buyer, pipeline, revenue claim, or delivered email is **not** implied by these screenshots.
+
+## Installation, operation, and implementation details
 
 An evidence-first SDR review workspace. Research informs; people authorize.
 
@@ -73,4 +121,4 @@ Corrects the displayed release version and the documented output-token limit. Ti
 
 Saved drafts and decisions are preserved by the updater. Running research again replaces the current draft and revokes approval; event history does not retain complete prior draft text. Use a separate lead for experiments or copy any draft you want to retain first.
 
-Repository handoff: see [release checklist](docs/REPOSITORY_CHECKLIST.md). No repository has been published by this update.
+Repository handoff: see [release checklist](docs/REPOSITORY_CHECKLIST.md). This historical release note describes the earlier v0.3.1 packaging checkpoint.
