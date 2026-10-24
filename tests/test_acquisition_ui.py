@@ -12,7 +12,7 @@ def client():
 def test_page_and_assets():
     c=client()
     assert c.get('/acquisition').status_code == 200
-    assert b'Fictional preview only' in c.get('/acquisition').content
+    assert b'Preview uses fictional examples and makes no API calls.' in c.get('/acquisition').content
     assert c.get('/acquisition/ui.css').status_code == 200
     assert c.get('/acquisition/ui.js').status_code == 200
 
