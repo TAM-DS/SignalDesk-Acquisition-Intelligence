@@ -116,7 +116,12 @@ def create_app(database_url=None):
         engine.dispose()
 
     app = FastAPI(title="SignalDesk local demo", lifespan=lifespan)
+
+    from .acquisition.interface import router as acquisition_router
+    app.include_router(acquisition_router)
+
     app.state.engine = engine
+
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "testserver"])
 
     @app.middleware("http")

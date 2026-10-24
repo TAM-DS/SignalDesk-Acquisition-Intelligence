@@ -8,8 +8,10 @@ __pycache__/
 backups/
 dist/
 build/
-.env.*
-*.sqlite
-*.sqlite3
+
+# Local development files
 .DS_Store
 .idea/
+
+# Local test screenshots
+tests/Screenshot*.png
