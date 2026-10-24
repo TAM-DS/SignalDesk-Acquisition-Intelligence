@@ -10,7 +10,7 @@ liveButton.addEventListener('click',async()=>{output.replaceChildren();if(!docum
 async function queueApi(url,data){
   const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   const body=await response.json();
-  if(!response.ok)throw Error(typeof body.detail==='string'?body.detail:'Review request failed');
+  if(!response.ok){const message=typeof body.detail==='string'?body.detail:Array.isArray(body.detail)?body.detail.map(x=>((x.loc||[]).slice(-1)[0]||'Field')+': '+x.msg).join('; '):'Review request failed';throw Error(message);}
   return body;
 }
 function inputField(parent,labelText,name,type='text'){
@@ -44,8 +44,8 @@ async function refreshQueue(){
         const note=inputField(form,'Review notes','note');note.minLength=3;
         for(const [label,approve] of [['Approve company for handoff',true],['Reject company',false]]){
           const button=el('button',label,form);button.type='button';
-          button.addEventListener('click',async()=>{button.disabled=true;try{
-            await queueApi('/api/acquisition/queue/'+item.id+'/decision',{approve,evidence_reviewed:checkbox.checked,note:note.value});
+          button.addEventListener('click',async()=>{if(!note.value.trim() || note.value.trim().length<3){alert('Enter review notes of at least 3 characters.');note.focus();return;}if(approve&&!checkbox.checked){alert('Open and verify the sources before approving, then check the evidence confirmation box.');return;}button.disabled=true;try{
+            await queueApi('/api/acquisition/queue/'+item.id+'/decision',{approve,evidence_reviewed:checkbox.checked,note:note.value.trim()});
             await refreshQueue();
           }catch(err){button.disabled=false;alert(err.message);}});
         }
