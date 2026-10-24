@@ -43,7 +43,7 @@ def test_invented_candidate_url_remains_blocked():
     api, _ = client(response)
     with pytest.raises(DiscoveryFailure) as err:
         discover_live(req(), client=api)
-    assert err.value.code == "invalid_evidence"
+    assert err.value.code == "citation_mismatch"
 
 
 def test_non_web_search_sources_are_not_trusted():
