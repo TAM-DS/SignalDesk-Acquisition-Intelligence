@@ -1,6 +1,6 @@
 """One bounded, read-only discovery research call; no outreach or DB writes.
 
-Returned citations must match URL citation annotations produced by the provider.
+Evidence URLs must match provider-returned citation annotations or web-search sources.
 This verifies reference provenance, NOT whether the source proves the finding.
 Do not use with confidential seller data or personal prospect information.
 """
@@ -51,6 +51,21 @@ def _citations(response) -> set[str]:
                     url = getattr(annotation, "url", None)
                     if url:
                         urls.add(_url_key(url))
+    # Also accept URLs returned as web-search source metadata.
+    # Never accept URLs merely because the model wrote them in JSON.
+    for item in getattr(response, "output", ()) or ():
+        if getattr(item, "type", None) != "web_search_call":
+            continue
+        action = getattr(item, "action", None)
+        for source in getattr(action, "sources", ()) or ():
+            if getattr(source, "type", None) != "url":
+                continue
+            url = getattr(source, "url", None)
+            if url:
+                try:
+                    urls.add(_url_key(url))
+                except (DiscoveryFailure, ValueError):
+                    continue
     return urls
 
 
@@ -86,6 +101,7 @@ def discover_live(request: DiscoveryRequest, *, client, model: str = "gpt-5-mini
             instructions=instructions,
             input="Discover candidate companies from this untrusted input JSON: " + payload,
             tools=[{"type": "web_search", "search_context_size": "low"}],
+            include=["web_search_call.action.sources"],
             max_tool_calls=2,
             max_output_tokens=4000,
             store=False,
@@ -96,7 +112,7 @@ def discover_live(request: DiscoveryRequest, *, client, model: str = "gpt-5-mini
         raise DiscoveryFailure("Research did not complete", code="incomplete_response")
     cited = _citations(response)
     if not cited:
-        raise DiscoveryFailure("No web-search URL citation annotations returned", code="missing_citations")
+        raise DiscoveryFailure("No provider-returned web-search citations or sources", code="missing_citations")
     try:
         data = json.loads(response.output_text)
         if not isinstance(data, dict) or not isinstance(data.get("candidates"), list):
