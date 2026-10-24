@@ -53,3 +53,40 @@ def test_incomplete_provider_response_categorized():
 def test_valid_citation_still_accepts_for_human_review():
     report = discover_live(REQUEST, client=fake_client(annotations=[URL]))
     assert report.shortlist.candidates[0].status == 'needs_human_review'
+
+
+def test_empty_researched_result_without_citations_is_valid():
+    from types import SimpleNamespace as NS
+    from test_acquisition_live import reply, client
+    response = reply(data={"candidates": []}, urls=())
+    response.output.append(NS(type="web_search_call", action=NS(type="search", sources=[])))
+    api, _ = client(response)
+    report = discover_live(REQUEST, client=api)
+    assert report.shortlist.candidates == ()
+    assert report.citation_urls == ()
+
+
+def test_empty_result_without_web_search_still_fails_closed():
+    from test_acquisition_live import reply, client
+    api, _ = client(reply(data={"candidates": []}, urls=()))
+    with pytest.raises(DiscoveryFailure) as err:
+        discover_live(REQUEST, client=api)
+    assert err.value.code == "missing_citations"
+
+
+def test_invalid_json_has_safe_category():
+    from test_acquisition_live import reply, client
+    api, _ = client(reply())
+    api.responses.response.output_text = "not-json-SECRET"
+    with pytest.raises(DiscoveryFailure) as err:
+        discover_live(REQUEST, client=api)
+    assert err.value.code == "invalid_json"
+    assert "SECRET" not in str(err.value)
+
+
+def test_invalid_candidates_envelope_has_safe_category():
+    from test_acquisition_live import reply, client
+    api, _ = client(reply(data={"other": []}))
+    with pytest.raises(DiscoveryFailure) as err:
+        discover_live(REQUEST, client=api)
+    assert err.value.code == "invalid_shape"
