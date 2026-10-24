@@ -1,4 +1,27 @@
-# Validation record — v0.3.1
+# Validation record — v0.4.0 release candidate
+
+October 24, 2026. This is the v0.4 release-candidate status, not a final release acceptance certificate.
+
+## Evidence presently available
+- Developer-reported local run: **108 automated tests passing** in the Mac development environment prior to the release-readiness changes. The new GitHub Actions matrix and installed-wheel smoke test were subsequently added; their outcomes must be checked independently.
+- Live Acquisition Intelligence: the developer observed a successful OpenAI-powered company-discovery session displaying candidate companies, citations, and an opt-in Save for Human Review control. A later browser screenshot confirmed that Aera Technology was saved to a **pending** persistent review item with five reference links.
+- The screenshot confirms queue persistence/display, **not** approval, accepted buyer-fit claims, successful SDR lead creation, or completed end-to-end handoff.
+- The dashboard and delivery screenshots do not establish real email delivery. Sending remains simulated by design.
+- The MIT LICENSE, version metadata, README and wheel packaging were updated as release preparation. The installed-wheel test must pass before we claim a distributable build is validated.
+
+## Release acceptance not yet demonstrated
+- [ ] GitHub Actions Python matrix passes on the final branch SHA.
+- [ ] Built wheel installs in isolation and serves both SDR and Acquisition Intelligence assets.
+- [ ] Browser: check actual source claims and company fit, approve review only with a justified basis, explicitly authorize handoff, and confirm SDR lead status `research_needed`, without sending a message.
+- [ ] Confirm browser rejection, existing-lead/duplicate, and Do Not Contact behavior.
+- [ ] Confirm packaging and README links, review PR diff, and merge only after checks pass.
+
+## Limitations
+Provider-returned URLs are attribution/provenance, not evidence that quoted claims are true. Live API use requires explicit opt-in and may incur fees. This single-user local app is not authenticated or suited to public hosting, sensitive records, or production delivery.
+
+---
+
+## Historical validation — v0.3.1
 
 October 15, 2026. Automated checks ran on Linux, Python 3.12.
 
