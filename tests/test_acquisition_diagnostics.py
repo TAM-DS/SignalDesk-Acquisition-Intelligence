@@ -41,7 +41,7 @@ def test_provider_exception_categorized_without_raw_error_text():
 def test_invalid_citation_still_rejected():
     with pytest.raises(DiscoveryFailure) as err:
         discover_live(REQUEST, client=fake_client(annotations=['https://another.example.org/unrelated']))
-    assert err.value.code == 'invalid_evidence'
+    assert err.value.code == 'citation_mismatch'
 
 
 def test_incomplete_provider_response_categorized():
