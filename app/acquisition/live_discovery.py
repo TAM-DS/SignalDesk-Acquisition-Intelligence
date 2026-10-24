@@ -110,15 +110,26 @@ def discover_live(request: DiscoveryRequest, *, client, model: str = "gpt-5-mini
         raise DiscoveryFailure("Provider research failed; no candidates saved", code="provider_error", provider_type=type(exc).__name__) from exc
     if getattr(response, "status", None) not in (None, "completed"):
         raise DiscoveryFailure("Research did not complete", code="incomplete_response")
+    # Decode before imposing a citation requirement: zero results need no citations.
+    # Keep malformed output separate from source-provenance failures.
+    try:
+        data = json.loads(response.output_text)
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise DiscoveryFailure("Provider did not return valid JSON", code="invalid_json") from exc
+    if not isinstance(data, dict) or not isinstance(data.get("candidates"), list):
+        raise DiscoveryFailure("Provider returned an invalid candidates envelope", code="invalid_shape")
+    if len(data["candidates"]) > 10:
+        raise DiscoveryFailure("Provider returned too many candidate records", code="invalid_shape")
+    # Empty lists are legitimate no-match results, but still require a web-search
+    # call so a model cannot quietly skip research and claim no matches.
+    search_calls = sum(getattr(x, "type", None) == "web_search_call"
+                       for x in getattr(response, "output", ()) or ())
+    if not data["candidates"] and search_calls:
+        return DiscoveryReport(shortlist(request, []), (), research_calls=1)
     cited = _citations(response)
     if not cited:
         raise DiscoveryFailure("No provider-returned web-search citations or sources", code="missing_citations")
     try:
-        data = json.loads(response.output_text)
-        if not isinstance(data, dict) or not isinstance(data.get("candidates"), list):
-            raise ValueError("Not a candidates object")
-        if len(data["candidates"]) > 10:
-            raise ValueError("Provider returned more than ten candidates")
         items = []
         for row in data["candidates"]:
             evidence_rows = row["evidence"]
