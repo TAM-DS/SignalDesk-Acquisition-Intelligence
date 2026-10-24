@@ -127,13 +127,15 @@ def discover_live(request: DiscoveryRequest, *, client, model: str = "gpt-5-mini
             evidence = []
             for source in evidence_rows:
                 if _url_key(source["url"]) not in cited:
-                    raise ValueError("Citation was not returned by provider")
+                    raise DiscoveryFailure("Candidate URL absent from provider-returned sources", code="citation_mismatch")
                 evidence.append(Evidence(source["source_id"], source["url"], source["finding"]))
             items.append(Candidate(
                 row["company"], row["domain"], row["fit_reason"], tuple(evidence),
                 tuple(row.get("unknowns", [])),
             ))
         result = shortlist(request, items)
-    except (TypeError, KeyError, ValueError, AttributeError, DiscoveryFailure) as exc:
+    except DiscoveryFailure:
+        raise
+    except (TypeError, KeyError, ValueError, AttributeError) as exc:
         raise DiscoveryFailure("Provider returned invalid or unsupported candidate evidence", code="invalid_evidence") from exc
     return DiscoveryReport(result, tuple(sorted(cited)))
