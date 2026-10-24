@@ -52,15 +52,21 @@ An evidence-first SDR review workspace. Research informs; people authorize.
 
 A local, single-user prototype with seven fictional demonstration leads plus optional live OpenAI web research and drafting for user-entered leads. Delivery is always simulated. Automated tests use mocked provider responses. A user-operated live run also completed successfully; one example does not establish research accuracy or sales results. See the validation record for observed results and limits.
 
+## Open source and reuse
+
+SignalDesk is released under the [MIT License](LICENSE). You can clone, modify, and redistribute it, including for commercial projects, subject to the license notice and disclaimer. **Open source does not mean production ready:** run locally, protect API credentials, independently review model output, and do not enter sensitive customer data.
+
 ## Existing installation
 
 Follow **docs/UPGRADE.md** to preserve your decisions and database. Do not replace your existing project directory with the release directory.
 
-## Fresh installation on your Mac
+## Fresh installation (macOS, Linux, or Windows with an appropriate shell)
 
-Open this folder in PyCharm and run:
+Clone the repository, enter the project directory, then create a Python 3.11+ environment and run the following (the commands below use a macOS/Linux shell):
 
 ```bash
+git clone https://github.com/TAM-DS/signaldesk.git
+cd signaldesk
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
@@ -99,6 +105,9 @@ The default database is `signaldesk.db` in the directory from which you start th
 
 ## Validation and next steps
 
+The GitHub Actions workflow runs offline pytest checks on Python 3.11–3.13 and builds a wheel, then launches the installed wheel in an isolated working directory to verify SDR and Acquisition Intelligence pages and assets. Check the Actions/PR status before relying on this claim as passing CI. This does not verify external OpenAI services or browser-side approval and handoff.
+
+
 ```bash
 python -m pytest -q
 ```
@@ -107,7 +116,7 @@ See docs/VALIDATION.md for the tested boundary, docs/PRODUCT_BRIEF.md for the pr
 
 API references: https://developers.openai.com/api/docs/guides/tools-web-search and https://developers.openai.com/api/docs/guides/structured-outputs.
 
-## v0.3 changes and limits
+## Historical notes — v0.3 changes and limits
 
 Consolidates the user's working v0.2 patches: 4,000 output tokens per response, low reasoning for gpt-5-mini, bounded search, diagnostic error labels, and explicit ICP gates. New installs default to gpt-5-mini; existing .env model settings are preserved.
 
@@ -115,7 +124,7 @@ Drafting instructions now prohibit seller track-record assertions, treating the 
 
 Live source cards (including existing records) display neutral reference descriptions; stored research and original source data remain unchanged. This avoids misleading clipped snippets without adding API calls. Live fit review is labeled AI-assisted rather than rule-based.
 
-## v0.3.1 changes
+## Historical notes — v0.3.1 changes
 
 Corrects the displayed release version and the documented output-token limit. Tightens drafting instructions so claim references cover prospect facts actually used in the subject and body, including business operations, while qualification-only facts stay in the rationale. This prompt change has not been live-evaluated and does not enforce semantic coverage in code.
 
