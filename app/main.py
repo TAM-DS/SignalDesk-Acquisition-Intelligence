@@ -265,8 +265,15 @@ def create_app(database_url=None):
                     tuple(AcquisitionEvidence(**x) for x in data['evidence']),
                     tuple(data.get('unknowns', [])),
                 )
-                existing = [dict(domain=x.data.get('domain'), suppressed=x.suppressed)
-                            for x in db.scalars(select(Lead))]
+                existing = []
+                for lead in db.scalars(select(Lead)):
+                    known_domain = lead.data.get('domain')
+                    if known_domain:
+                        existing.append(dict(domain=known_domain, suppressed=lead.suppressed))
+                    elif lead.data.get('mode') == 'live':
+                        raise HTTPException(409, 'Existing live lead lacks a domain; manual reconciliation required.')
+                    elif lead.suppressed and lead.data.get('company', '').strip().casefold() == candidate.company.strip().casefold():
+                        raise HTTPException(409, 'Do Not Contact: an existing suppressed company has the same name.')
                 result = evaluate_handoff(
                     candidate, existing,
                     approved_by_human=True, evidence_reviewed=True,
