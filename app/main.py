@@ -20,6 +20,8 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .fixtures import LEADS, OFFER
 from .live import NewLead, configuration, research_and_draft, LiveFailure
+from .acquisition.models import Candidate as AcquisitionCandidate, Evidence as AcquisitionEvidence
+from .acquisition.handoff import evaluate_handoff, canonical_domain
 
 load_dotenv(Path(__file__).resolve().parent.parent / '.env', override=False)
 live_reservation_lock = threading.Lock()
@@ -37,6 +39,16 @@ class Lead(Base):
     revision: Mapped[int] = mapped_column(Integer, default=1)
     approved_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     suppressed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class AcquisitionReview(Base):
+    __tablename__ = 'acquisition_reviews'
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    candidate: Mapped[dict] = mapped_column(JSON)
+    state: Mapped[str] = mapped_column(String(30))
+    note: Mapped[str] = mapped_column(Text, default='')
+    lead_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    created_at: Mapped[str] = mapped_column(String(50))
 
 
 class Event(Base):
@@ -61,6 +73,34 @@ class ResearchRun(Base):
     status: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[str] = mapped_column(String(50))
     detail: Mapped[dict] = mapped_column(JSON)
+
+
+class AcquisitionEvidenceInput(BaseModel):
+    source_id: str = Field(min_length=1, max_length=80)
+    url: str = Field(min_length=10, max_length=2000)
+    finding: str = Field(min_length=1, max_length=1500)
+
+
+class AcquisitionQueueInput(BaseModel):
+    company: str = Field(min_length=1, max_length=160)
+    domain: str = Field(min_length=4, max_length=253)
+    fit_reason: str = Field(min_length=1, max_length=1500)
+    evidence: list[AcquisitionEvidenceInput] = Field(min_length=1, max_length=10)
+    unknowns: list[str] = Field(default_factory=list, max_length=20)
+
+
+class AcquisitionDecision(BaseModel):
+    approve: bool
+    evidence_reviewed: bool = False
+    note: str = Field(min_length=3, max_length=1000)
+
+
+class AcquisitionHandoff(BaseModel):
+    contact: str = Field(min_length=2, max_length=160)
+    seller: str = Field(min_length=2, max_length=160)
+    offer: str = Field(min_length=20, max_length=2000)
+    icp: str = Field(min_length=10, max_length=1500)
+    confirm_create: bool = False
 
 
 class Edit(Action):
@@ -159,6 +199,112 @@ def create_app(database_url=None):
             db.add(Event(lead_id=id, action='created', detail='Live lead added. No API call made yet; delivery remains simulated.', timestamp=datetime.now(timezone.utc).isoformat()))
             db.commit()
             return present(row)
+
+    @app.post('/api/acquisition/queue', status_code=201)
+    def queue_acquisition(payload: AcquisitionQueueInput):
+        """Store a manually submitted research suggestion, never automatically approved."""
+        try:
+            candidate = AcquisitionCandidate(
+                payload.company, payload.domain, payload.fit_reason,
+                tuple(AcquisitionEvidence(x.source_id, x.url, x.finding) for x in payload.evidence),
+                tuple(payload.unknowns),
+            )
+            normalized = canonical_domain(candidate.domain)
+        except (ValueError, TypeError, AttributeError) as exc:
+            raise HTTPException(422, 'Invalid candidate evidence or domain.') from exc
+        with Session(engine) as db:
+            records = list(db.scalars(select(AcquisitionReview)))
+            if any(canonical_domain(r.candidate['domain']) == normalized and r.state != 'rejected' for r in records):
+                raise HTTPException(409, 'This company already exists in the review queue.')
+            review = AcquisitionReview(
+                id='aq-' + uuid4().hex[:16],
+                candidate=payload.model_dump(),
+                state='pending', note='', lead_id=None,
+                created_at=datetime.now(timezone.utc).isoformat(),
+            )
+            db.add(review)
+            db.commit()
+            return {'id': review.id, 'state': review.state, 'candidate': review.candidate}
+
+    @app.get('/api/acquisition/queue')
+    def list_acquisition():
+        with Session(engine) as db:
+            return [{'id': r.id, 'candidate': r.candidate, 'state': r.state,
+                     'note': r.note, 'lead_id': r.lead_id, 'created_at': r.created_at}
+                    for r in db.scalars(select(AcquisitionReview).order_by(AcquisitionReview.created_at))]
+
+    @app.post('/api/acquisition/queue/{review_id}/decision')
+    def decide_acquisition(review_id: str, payload: AcquisitionDecision):
+        with Session(engine) as db:
+            row = db.get(AcquisitionReview, review_id)
+            if row is None:
+                raise HTTPException(404, 'Candidate not found.')
+            if row.state != 'pending':
+                raise HTTPException(409, 'Decision already recorded.')
+            if payload.approve and not payload.evidence_reviewed:
+                raise HTTPException(422, 'Verify evidence before approving.')
+            row.state = 'reviewed' if payload.approve else 'rejected'
+            row.note = payload.note
+            db.commit()
+            return {'id': row.id, 'state': row.state, 'note': row.note}
+
+    @app.post('/api/acquisition/queue/{review_id}/handoff', status_code=201)
+    def handoff_acquisition(review_id: str, payload: AcquisitionHandoff):
+        if not payload.confirm_create:
+            raise HTTPException(422, 'Explicitly confirm creation of a review-only live lead.')
+        with live_reservation_lock, Session(engine) as db:
+            row = db.get(AcquisitionReview, review_id)
+            if row is None:
+                raise HTTPException(404, 'Candidate not found.')
+            if row.state != 'reviewed':
+                raise HTTPException(409, 'Human approval required or candidate already transferred.')
+            data = row.candidate
+            try:
+                candidate = AcquisitionCandidate(
+                    data['company'], data['domain'], data['fit_reason'],
+                    tuple(AcquisitionEvidence(**x) for x in data['evidence']),
+                    tuple(data.get('unknowns', [])),
+                )
+                existing = [dict(domain=x.data.get('domain'), suppressed=x.suppressed)
+                            for x in db.scalars(select(Lead))]
+                result = evaluate_handoff(
+                    candidate, existing,
+                    approved_by_human=True, evidence_reviewed=True,
+                    contact=payload.contact,
+                )
+            except (ValueError, KeyError, TypeError):
+                raise HTTPException(409, 'Candidate or existing lead data is invalid.')
+            if not result.allowed:
+                raise HTTPException(409, result.reason)
+            try:
+                validated = NewLead(
+                    company=candidate.company, domain=candidate.domain,
+                    contact=payload.contact, seller=payload.seller,
+                    offer=payload.offer, icp=payload.icp, consent_to_api=True,
+                )
+            except ValueError as exc:
+                raise HTTPException(422, 'Lead details are incomplete or invalid.') from exc
+            lead_id = 'live-' + uuid4().hex[:16]
+            new_data = {**validated.model_dump(exclude={'consent_to_api'}), 'id': lead_id,
+                        'mode': 'live', 'sector': 'Acquisition-reviewed company',
+                        'employee_count': None, 'recipient': 'review@example.com',
+                        'sources': [], 'claims': [], 'rationale': candidate.fit_reason,
+                        'subject': '', 'body': '',
+                        'hold': 'Acquisition evidence needs independent verification before drafting.',
+                        'suppressed': False,
+                        'acquisition_review_id': row.id,
+                        'acquisition_evidence': data['evidence'],
+                        'acquisition_unknowns': data.get('unknowns', [])}
+            db.add(Lead(id=lead_id, data=new_data, state='research_needed',
+                        revision=1, suppressed=False))
+            db.add(Event(lead_id=lead_id, action='acquisition_handoff',
+                         detail='Human-reviewed candidate transferred; no research or outreach started.',
+                         timestamp=datetime.now(timezone.utc).isoformat()))
+            row.state = 'transferred'
+            row.lead_id = lead_id
+            db.commit()
+            return {'review_id': row.id, 'lead_id': lead_id, 'state': 'research_needed',
+                    'notice': 'Lead created for review; no API calls or messages sent.'}
 
     @app.get('/api/leads/{lead_id}/runs')
     def runs(lead_id: str):
