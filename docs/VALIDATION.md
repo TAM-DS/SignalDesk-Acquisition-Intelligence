@@ -9,6 +9,17 @@ October 24, 2026. This is the v0.4 release-candidate status, not a final release
 - The dashboard and delivery screenshots do not establish real email delivery. Sending remains simulated by design.
 - The MIT LICENSE, version metadata, README and wheel packaging were updated as release preparation. The installed-wheel test must pass before we claim a distributable build is validated.
 
+## Screenshot evidence (committed to the release branch)
+
+- [Research attempt quota / visible limit](images/11-No-surprise-API-bills-Zero-executive-exceptions.png)
+- [Live acquisition candidate](images/12-Live-Candidate.png)
+- [Human-authorized handoff form](images/13-Finalize-Lead.png)
+- [Acquisition review evidence](images/14-Acquistion-Evidence.png)
+- [SDR handoff receipt](images/10-SignalDesk-Human-Approved-Handoff.png)
+- [Subsequent evidence hold and decision history](images/15-Validation.png)
+
+These screenshots are records of user-operated local behavior, not independent verification of company fit, named contact identity, or delivery.
+
 ## October 25 — observed end-to-end browser acceptance
 
 Developer-provided screenshots document this specific sequence:
