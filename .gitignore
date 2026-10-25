@@ -3,6 +3,9 @@ __pycache__/
 .pytest_cache/
 *.db
 *.db-*
+*.sqlite
+*.sqlite3
+.env.*
 *.egg-info/
 .env
 backups/
