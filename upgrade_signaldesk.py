@@ -12,7 +12,7 @@ FILES = ['pyproject.toml', '.gitignore', 'requirements-tested.txt', 'README.md',
          'app/static/index.html', 'app/static/style.css', 'app/static/app.js',
          'tests/test_authority.py', 'tests/test_live.py',
          'docs/PRODUCT_BRIEF.md', 'docs/INTERVIEW_WALKTHROUGH.md',
-         'docs/VALIDATION.md', 'docs/UPGRADE.md', 'docs/REPOSITORY_CHECKLIST.md', 'docs/ARCHITECTURE.md']
+         'docs/VALIDATION.md', 'docs/UPGRADE.md', 'docs/REPOSITORY_CHECKLIST.md']
 
 
 def main():

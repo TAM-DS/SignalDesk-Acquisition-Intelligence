@@ -3,13 +3,18 @@ __pycache__/
 .pytest_cache/
 *.db
 *.db-*
+*.sqlite
+*.sqlite3
+.env.*
 *.egg-info/
 .env
 backups/
 dist/
 build/
-.env.*
-*.sqlite
-*.sqlite3
+
+# Local development files
 .DS_Store
 .idea/
+
+# Local test screenshots
+tests/Screenshot*.png
