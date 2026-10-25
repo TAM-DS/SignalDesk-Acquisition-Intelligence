@@ -9,11 +9,25 @@ October 24, 2026. This is the v0.4 release-candidate status, not a final release
 - The dashboard and delivery screenshots do not establish real email delivery. Sending remains simulated by design.
 - The MIT LICENSE, version metadata, README and wheel packaging were updated as release preparation. The installed-wheel test must pass before we claim a distributable build is validated.
 
+## October 25 — observed end-to-end browser acceptance
+
+Developer-provided screenshots document this specific sequence:
+
+1. Live Acquisition Intelligence returned JPMorgan Chase & Co. as a **candidate**, with provider-linked sources and explicit unverified-evidence warnings; candidate was saved to the human review queue.
+2. The review interface presented a form populated with contact/department, seller, offering, ICP, and an explicit authorization checkbox. The next screenshot establishes that transfer completed, but the form screenshot alone does not establish source truth or verified recipient identity.
+3. The original SDR workspace displayed **JPMorgan Chase & Co.** with status **Needs evidence** and a decision-history `ACQUISITION_HANDOFF` event: "Human-reviewed candidate transferred; no research or outreach started."
+4. A later developer screenshot displayed `LIVE_STARTED` and `LIVE_COMPLETED` after the user separately initiated live research in the SDR workspace (two response calls, one search call). The AI-assisted review did **not** confirm the named contact's role or employment. The system displayed an **Evidence hold** rather than an approvable outreach draft.
+5. The `RESEARCH` decision-history entry documents a request for further evidence **without automatically starting another live request**. No email-provider connection or actual outgoing delivery exists.
+
+**What this demonstrates:** an observed controlled research → human-authorized lead creation → evidence hold workflow. **What it does not demonstrate:** that JPMorgan is a buyer, that the named individual has the asserted role, that provider-returned sources prove every claim, or that messages were delivered.
+
+The author also confirmed that the 108 local automated tests passed (`108 passed in 0.99s`) following the initial release-readiness updates. A later GitHub Actions matrix run passed on commit `d68b129`. A subsequent change restored `.env.*`, `*.sqlite`, and `*.sqlite3` ignore rules; the final merged SHA still requires green CI.
+
 ## Release acceptance not yet demonstrated
 - [ ] GitHub Actions Python matrix passes on the final branch SHA.
 - [ ] Built wheel installs in isolation and serves both SDR and Acquisition Intelligence assets.
-- [ ] Browser: check actual source claims and company fit, approve review only with a justified basis, explicitly authorize handoff, and confirm SDR lead status `research_needed`, without sending a message.
-- [ ] Confirm browser rejection, existing-lead/duplicate, and Do Not Contact behavior.
+- [x] Browser: observed human-authorized acquisition handoff to an SDR lead in Needs evidence, with no automatic outreach. Independent verification of company fit and contact identity is not claimed.
+- [ ] Confirm browser rejection, existing-lead/duplicate, and Do Not Contact behavior (automated tests exist; prior screenshots were reported, not independently revalidated for this release).
 - [ ] Confirm packaging and README links, review PR diff, and merge only after checks pass.
 
 ## Limitations
