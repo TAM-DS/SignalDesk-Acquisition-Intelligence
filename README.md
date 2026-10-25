@@ -10,6 +10,8 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 **AI capability is not unlimited spending authority.** SignalDesk makes live Acquisition Intelligence research an explicit opt-in action, with a locally persisted allowance of **five attempts per UTC day, including failed attempts**. Once the allowance is exhausted, the application responds with HTTP `429` instead of launching another live research request. The human review queue remains accessible so work already completed can continue.
 
+![Research request limit enforced in the local interface](docs/images/11-No-surprise-API-bills-Zero-executive-exceptions.png)
+
 This is a **request-count control, not a dollar budget or provider-side billing guarantee**. Individual requests may have different costs; API pricing and account billing are controlled by the provider. Review your provider usage dashboard and configure provider-side spending controls where available. Never interpret a `429` as permission to bypass the limit.
 
 *Research is bounded. Evidence is reviewable. Human authority is required before a company becomes an SDR lead.*
@@ -40,6 +42,22 @@ The interface and its controls:
 
 ![Full OpenAI-powered Acquisition Intelligence view](docs/images/07-Full-Powered-By-OpenAI.png)
 
+## Validated workflow — from live candidate to evidence hold
+
+These developer-operated screenshots document a successful controlled handoff. **They do not establish that the candidate is a verified buyer, that the named contact's employment is confirmed, or that any outreach was sent.**
+
+| Stage | Evidence |
+| --- | --- |
+| Live candidate identified | [Live Acquisition Intelligence results](docs/images/12-Live-Candidate.png) |
+| Explicit human-authorized transfer | [Handoff form and confirmation](docs/images/13-Finalize-Lead.png) |
+| Review and supporting references | [Acquisition review evidence](docs/images/14-Acquistion-Evidence.png) |
+| Recorded handoff into SDR | [Human-approved handoff](docs/images/10-SignalDesk-Human-Approved-Handoff.png) |
+| Independent research held for insufficient identity evidence | [SDR evidence hold and decision history](docs/images/15-Validation.png) |
+
+![SDR evidence hold after separately initiated live research](docs/images/15-Validation.png)
+
+The receiving lead remained **Needs evidence**. A subsequent human-triggered research action did not verify the named contact; the application kept the evidence hold rather than generating an approvable message. See [validation record](docs/VALIDATION.md) for what was and was not observed.
+
 ## SDR workspace — evidence before outreach
 
 Human reviewers can inspect fictional demonstration leads, trace supporting references, edit messages, approve an exact draft version, or reject and suppress outreach. Editing or new research invalidates prior approval. The **delivery action is simulated**, with no email-provider integration.
@@ -50,7 +68,7 @@ Human reviewers can inspect fictional demonstration leads, trace supporting refe
 
 ## Safety and validation boundaries
 
-- The nine screenshots illustrate the UI and workflow. Some screens show **fictional examples**; live research screens show provider-returned recommendations, not independently verified customer facts.
+- The screenshots illustrate the UI and workflow. Some screens show **fictional examples**; live research screens show provider-returned recommendations, not independently verified customer facts.
 - The acquisition and SDR flows are designed for **local, single-user use**. There is no authentication, multi-tenant security, or production-ready deployment.
 - The acquisition adapter accepts only URLs found in provider citation annotations or web-search source metadata. A matched source reference does **not** prove the claims it accompanies.
 - Automated tests use mocked provider interactions; a successful live run demonstrates integration behavior, **not qualification accuracy or business outcomes**.
