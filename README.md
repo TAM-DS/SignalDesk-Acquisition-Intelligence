@@ -6,6 +6,12 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 ![SignalDesk SDR dashboard](docs/images/01-SignalDesk-SDR.png)
 
+## Salesforce x SignalDesk | Client-to-Value proof of value (integration foundation)
+
+**New offline, fictional Salesforce Lead assessment contract:** A fail-closed, testable foundation for future Agentforce/Salesforce integration. Seven invented CRM-shaped Leads produce documented review/hold/block decisions without external calls, CRM writes, or outreach. **This is not yet connected to a Salesforce org or Agentforce.** See [the Salesforce client-engagement and technical acceptance plan](docs/SALESFORCE_POV.md).
+
+Run the demonstration: `python -m app.salesforce.demo`. Human approval and Do Not Contact boundaries remain mandatory for any future integration.
+
 ## No surprise API bills. No uncontrolled research loops. No executive exceptions.
 
 **AI capability is not unlimited spending authority.** SignalDesk makes live Acquisition Intelligence research an explicit opt-in action, with a locally persisted allowance of **five attempts per UTC day, including failed attempts**. Once the allowance is exhausted, the application responds with HTTP `429` instead of launching another live research request. The human review queue remains accessible so work already completed can continue.
