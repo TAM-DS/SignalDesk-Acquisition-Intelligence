@@ -2,7 +2,7 @@
 
 **Milestone 1 — Salesforce Lead contract, bounded read-only adapter & presales proof-of-value plan.**
 
-> This is an **offline, synthetic contract** and a proposed technical presales engagement. It is **not** integrated with Salesforce, Agentforce, Data 360, a production CRM, customer data, or email delivery.
+> The Lead contract and bounded read-only REST client are implemented and tested offline with simulated HTTP responses. Live Salesforce authentication is not yet verified. Agentforce, Data 360, production CRM integration and email delivery are not implemented by this milestone.
 
 ## Client scenario and discovery
 
@@ -101,3 +101,6 @@ Define **B** as current manual research minutes per lead, **A** as reviewed AI-a
 **Next engineering gate:** Configure least-privilege OAuth in a development org, verify a live read-only retrieval against fictional records, and reconcile actual schema and permissions before considering CRM changes.
 
 **Portfolio claim:** "Designed and tested an offline Salesforce suppression-safe qualification contract and a bounded read-only REST client, with a client discovery and proof-of-value plan." No live-org claim yet. **Do not claim a working Salesforce or Agentforce integration until one has been built and verified.**
+
+
+[Development-org validation runbook](SALESFORCE_DEV_ORG_VALIDATION.md) · [TAGM Client-to-Value Studio](TAGM_CLIENT_TO_VALUE_STUDIO.md)
