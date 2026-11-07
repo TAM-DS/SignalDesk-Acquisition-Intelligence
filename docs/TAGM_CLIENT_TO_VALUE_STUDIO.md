@@ -13,7 +13,7 @@ a record of paid client outcomes, or an integrated multi-system platform.
 | Engagement | Buyer problem | Working evidence | Next gate |
 |---|---|---|---|
 | [Salesforce × SignalDesk](SALESFORCE_POV.md) | Qualification work must respect suppression and human authority | Offline Lead contract; bounded GET-only REST client; test/package matrix | [Development-org validation](SALESFORCE_DEV_ORG_VALIDATION.md) |
-| [AEGIS-NHI](https://github.com/TAM-DS/AEGIS-NHI/blob/main/docs/CLIENT_ENGAGEMENT.md) | Risk decisions need traceable identity, action, grant and evidence relationships | Synthetic case graphs, policy replay and source-consistency verification | Authorized ingestion contract and explicit join validation |
+| [AEGIS-NHI](https://github.com/TAM-DS/AEGIS-NHI/blob/main/docs/CLIENT_ENGAGEMENT.md) | Risk decisions need traceable identity, action, grant and evidence relationships | Synthetic case graphs, source-consistency verification and a separate offline cross-source contract | Source adapters, authenticated provenance and analyst-facing integration |
 
 ## The engagement method
 
@@ -50,9 +50,7 @@ Evaluate existing SIEM/SOAR/IAM capabilities before proposing new infrastructure
 A successful export verification establishes consistency with a selected source,
 not truth of the underlying source or permission to remediate.
 
-Cross-source ingestion must identify source system, institution, case, event,
-schema version and evidence provenance. Joining similar identifiers without
-explicit scope is not acceptable. External feeds remain future work.
+The [offline cross-source contract](https://github.com/TAM-DS/AEGIS-NHI/blob/main/docs/CROSS_SOURCE_CONTRACT.md) now validates source-scoped observations and explicit links with evidence from both records. It rejects cross-institution/case links and conflicting outcomes. Source allowlisting and declared hashes do not authenticate provenance. Real adapters, case-graph integration and external feeds remain future work.
 
 ## Commercial worksheet — illustrative USD assumptions
 
@@ -135,3 +133,6 @@ through: pain point → decision → trade-off → control → evidence → busi
 
 **Current evidence boundary:** software and synthetic tests exist; live Salesforce
 org validation, cross-source security integrations and customer ROI remain pending.
+
+
+[Run the 12-minute client demonstration](TAGM_DEMO_WALKTHROUGH.md). Commands, expected results and remaining gates are separated for each engagement.
