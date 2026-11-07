@@ -8,9 +8,9 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 ## Salesforce x SignalDesk | Client-to-Value proof of value (integration foundation)
 
-**New offline, fictional Salesforce Lead assessment contract:** A fail-closed, testable foundation for future Agentforce/Salesforce integration. Seven invented CRM-shaped Leads produce documented review/hold/block decisions without external calls, CRM writes, or outreach. **This is not yet connected to a Salesforce org or Agentforce.** See [the Salesforce client-engagement and technical acceptance plan](docs/SALESFORCE_POV.md).
+**Implemented and tested:** the offline Salesforce Lead assessment contract and an opt-in, bounded, authenticated **read-only Salesforce REST client**. The client only makes a fixed GET query and prints aggregate assessments; no CRM writes, approval grants, or outbound outreach. **Live Salesforce org and Agentforce connectivity are not yet verified.** See [the Salesforce client-engagement and technical acceptance plan](docs/SALESFORCE_POV.md).
 
-Run the demonstration: `python -m app.salesforce.demo`. Human approval and Do Not Contact boundaries remain mandatory for any future integration.
+Offline: `python -m app.salesforce.demo`. Optional development-org read-only preview after separate OAuth setup: `python -m app.salesforce.read_only_preview`. Human approval and Do Not Contact boundaries remain mandatory for any future integration.
 
 ## No surprise API bills. No uncontrolled research loops. No executive exceptions.
 
