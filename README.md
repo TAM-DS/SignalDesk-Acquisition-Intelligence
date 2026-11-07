@@ -12,6 +12,10 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 Offline: `python -m app.salesforce.demo`. Optional development-org read-only preview after separate OAuth setup: `python -m app.salesforce.read_only_preview`. Human approval and Do Not Contact boundaries remain mandatory for any future integration.
 
+## TAGM Client-to-Value Studio
+
+[Explore both client engagements](docs/TAGM_CLIENT_TO_VALUE_STUDIO.md): discovery, build/buy decisions, proof-of-value gates, commercial assumptions and executive readouts for SignalDesk and AEGIS-NHI. [Run the Salesforce development-org validation gate](docs/SALESFORCE_DEV_ORG_VALIDATION.md) when authorized org access is configured.
+
 ## No surprise API bills. No uncontrolled research loops. No executive exceptions.
 
 **AI capability is not unlimited spending authority.** SignalDesk makes live Acquisition Intelligence research an explicit opt-in action, with a locally persisted allowance of **five attempts per UTC day, including failed attempts**. Once the allowance is exhausted, the application responds with HTTP `429` instead of launching another live research request. The human review queue remains accessible so work already completed can continue.
