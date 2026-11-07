@@ -1,7 +1,7 @@
 """Salesforce read-only preview; no writes, persistence, outreach or Agentforce calls."""
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 import json
 import os
 import re
@@ -25,7 +25,7 @@ class NoRedirect(HTTPRedirectHandler):
 @dataclass(frozen=True)
 class SalesforceReadConfig:
     instance_url: str
-    access_token: str
+    access_token: str = field(repr=False)
     api_version: str = "66.0"
     max_records: int = 20
 
@@ -130,6 +130,8 @@ def preview_salesforce_leads(
         not isinstance(body, dict) or body.get("done") is not True
         or not isinstance(body.get("records"), list)
         or len(body["records"]) > config.max_records or body.get("nextRecordsUrl")
+        or type(body.get("totalSize")) is not int
+        or body["totalSize"] != len(body["records"])
     ):
         raise SalesforceReadError("CRM response incomplete or unexpected; fail-closed.")
     decisions = tuple(
