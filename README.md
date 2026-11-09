@@ -8,13 +8,13 @@ SignalDesk is a local, single-user B2B sales-development research and review app
 
 ## Salesforce x SignalDesk | Client-to-Value proof of value (integration foundation)
 
-**Implemented and tested:** the offline Salesforce Lead assessment contract and an opt-in, bounded, authenticated **read-only Salesforce REST client**. The client only makes a fixed GET query and prints aggregate assessments; no CRM writes, approval grants, or outbound outreach. **Live Salesforce org and Agentforce connectivity are not yet verified.** See [the Salesforce client-engagement and technical acceptance plan](docs/SALESFORCE_POV.md).
+**Implemented and tested:** the offline Salesforce Lead assessment contract and an opt-in, bounded, authenticated **read-only Salesforce REST client**. The client only makes a fixed GET query and prints aggregate assessments; no CRM writes, approval grants, or outbound outreach. **Live Salesforce developer-org validation completed on November 8, 2026:** 2 synthetic Leads assessed, 1 blocked, 1 requiring review, 0 held. Lead permission metadata reported query access allowed and create/update/delete denied. [Operator-run evidence and limitations](docs/SALESFORCE_DEV_ORG_VALIDATION.md). Agentforce and production connectivity remain unverified. See [the Salesforce client-engagement and technical acceptance plan](docs/SALESFORCE_POV.md).
 
 Offline: `python -m app.salesforce.demo`. Optional development-org read-only preview after separate OAuth setup: `python -m app.salesforce.read_only_preview`. Human approval and Do Not Contact boundaries remain mandatory for any future integration.
 
 ## TAGM Client-to-Value Studio
 
-[Explore both client engagements](docs/TAGM_CLIENT_TO_VALUE_STUDIO.md): discovery, build/buy decisions, proof-of-value gates, commercial assumptions and executive readouts for SignalDesk and AEGIS-NHI. [Run the Salesforce development-org validation gate](docs/SALESFORCE_DEV_ORG_VALIDATION.md) when authorized org access is configured.
+[Explore both client engagements](docs/TAGM_CLIENT_TO_VALUE_STUDIO.md): discovery, build/buy decisions, proof-of-value gates, commercial assumptions and executive readouts for SignalDesk and AEGIS-NHI. [Run the Salesforce development-org validation gate](docs/SALESFORCE_DEV_ORG_VALIDATION.md) for the completed limited live milestone and remaining negative cases.
 
 ## No surprise API bills. No uncontrolled research loops. No executive exceptions.
 
@@ -150,7 +150,7 @@ The GitHub Actions workflow runs offline pytest checks on Python 3.11–3.13 and
 python -m pytest -q
 ```
 
-See docs/VALIDATION.md for the tested boundary, docs/PRODUCT_BRIEF.md for the product hypothesis, and docs/INTERVIEW_WALKTHROUGH.md for a demonstration script. Next: run a small human-reviewed live evaluation against a single-prompt baseline; then validate review time and willingness to pay. Authentication, tenant isolation, durable workers, CRM integrations, pgvector, and real delivery remain future work.
+See docs/VALIDATION.md for the tested boundary, docs/PRODUCT_BRIEF.md for the product hypothesis, and docs/INTERVIEW_WALKTHROUGH.md for a demonstration script. Next: run a small human-reviewed live evaluation against a single-prompt baseline; then validate review time and willingness to pay. Authentication, tenant isolation, durable workers, CRM write/sync and research-queue integration, pgvector, and real delivery remain future work.
 
 API references: https://developers.openai.com/api/docs/guides/tools-web-search and https://developers.openai.com/api/docs/guides/structured-outputs.
 
