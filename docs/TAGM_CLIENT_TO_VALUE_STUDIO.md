@@ -12,7 +12,7 @@ a record of paid client outcomes, or an integrated multi-system platform.
 
 | Engagement | Buyer problem | Working evidence | Next gate |
 |---|---|---|---|
-| [Salesforce × SignalDesk](SALESFORCE_POV.md) | Qualification work must respect suppression and human authority | Offline Lead contract; bounded GET-only REST client; test/package matrix | [Development-org validation](SALESFORCE_DEV_ORG_VALIDATION.md) |
+| [Salesforce × SignalDesk](SALESFORCE_POV.md) | Qualification work must respect suppression and human authority | Operator-run live read: 2 synthetic Leads, 1 blocked, 1 review-required; read-only Lead capability metadata | [Remaining live negative cases and pilot measurement](SALESFORCE_DEV_ORG_VALIDATION.md) |
 | [AEGIS-NHI](https://github.com/TAM-DS/AEGIS-NHI/blob/main/docs/CLIENT_ENGAGEMENT.md) | Risk decisions need traceable identity, action, grant and evidence relationships | Synthetic case graphs, source-consistency verification and a separate offline cross-source contract | Source adapters, authenticated provenance and analyst-facing integration |
 
 ## The engagement method
@@ -131,8 +131,10 @@ The headline above expresses the target role and delivery focus. It is not a
 claim of having held a Salesforce or Agentforce job title. Present each project
 through: pain point → decision → trade-off → control → evidence → business consequence.
 
-**Current evidence boundary:** software and synthetic tests exist; live Salesforce
-org validation, cross-source security integrations and customer ROI remain pending.
+**Current Salesforce evidence boundary:** limited operator-run development-org
+validation passed on November 8, 2026; see the [evidence record](SALESFORCE_DEV_ORG_VALIDATION.md).
+Production deployment, remaining live negative cases and customer ROI remain pending.
+This update does not revalidate the AEGIS-NHI engagement.
 
 
 [Run the 12-minute client demonstration](TAGM_DEMO_WALKTHROUGH.md). Commands, expected results and remaining gates are separated for each engagement.
