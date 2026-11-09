@@ -2,7 +2,7 @@
 
 **Milestone 1 — Salesforce Lead contract, bounded read-only adapter & presales proof-of-value plan.**
 
-> The Lead contract and bounded read-only REST client are implemented and tested offline with simulated HTTP responses. Live Salesforce authentication is not yet verified. Agentforce, Data 360, production CRM integration and email delivery are not implemented by this milestone.
+> The Lead contract and bounded read-only REST client are implemented and tested offline with simulated HTTP responses. Limited live Salesforce authentication and retrieval were verified by the operator on November 8, 2026; see the [validation record](SALESFORCE_DEV_ORG_VALIDATION.md). Agentforce, Data 360, production CRM integration and email delivery are not implemented by this milestone.
 
 ## Client scenario and discovery
 
@@ -22,11 +22,11 @@
 
 ```mermaid
 flowchart TD
-    A["Salesforce development org | fictional Lead data"] --> B["Authenticated integration gateway | future"]
+    A["Salesforce development org | fictional Lead data"] --> B["Authenticated read-only REST client"]
     B --> C["Narrow normalization + suppression recheck"]
     C --> D{"Eligible for human review?"}
     D -->|no| E["BLOCK or HOLD with reason"]
-    D -->|yes| F["SignalDesk research queue"]
+    D -->|yes| F["SignalDesk research queue | future connection"]
     F --> G["Bounded research, evidence + edit"]
     G --> H{"Human decision"}
     H -->|reject| I["Record decision / suppress"]
@@ -37,7 +37,7 @@ flowchart TD
 
 **Existing SignalDesk core:** local research and acquisition queue, human review, duplicate checks, Do Not Contact suppression, version-bound draft approvals, and simulated-only delivery. These are **not automatically connected** to the new classifier yet.
 
-**Not built or verified:** OAuth setup, live-org connectivity, CRM writes/sync, Agentforce actions, integration middleware, Data 360, multi-user authentication, production deployment or live quality/value metrics. The tested read-only adapter accepts an externally supplied short-lived OAuth token.
+**Operator-verified:** OAuth login, a live two-fixture read, aggregate email opt-out behavior and read-only Lead capability metadata. **Not built or verified by this milestone:** CRM writes/sync, Agentforce actions, integration middleware, Data 360, multi-user authentication, production deployment or live quality/value metrics. The tested read-only adapter accepts an externally supplied short-lived OAuth token.
 
 ### Offline demonstration
 
@@ -50,29 +50,27 @@ This deterministic fixture is **7 invented Lead records**: 2 review-required, 3 
 
 ### Opt-in Salesforce developer-org REST preview — Milestone 1
 
-An implemented but **not live-verified** read-only client uses one HTTPS GET against Salesforce's [documented REST Query resource](https://developer.salesforce.com/docs/platform/api-rest/guide/resources-query.html). It selects only Id, Company, Website, HasOptedOutOfEmail, DoNotCall and IsDeleted, with a static SOQL statement and a limit of 20.
+An implemented, **operator-verified in a limited development-org run** read-only client uses one HTTPS GET against Salesforce's [documented REST Query resource](https://developer.salesforce.com/docs/platform/api-rest/guide/resources-query.html). It selects only Id, Company, Website, HasOptedOutOfEmail, DoNotCall and IsDeleted, with a static SOQL statement and a limit of 20.
 
 Security boundaries: HTTPS Salesforce My Domain only, OAuth bearer token supplied externally, no redirects, eight-second timeout, no automatic retries, 128 KB response limit, rejection of incomplete/paginated responses, and **aggregate-only printed results**. The underlying CRM identity is not used to authorize outreach or create a lead.
 
 **Only use an authorized Salesforce development org with fictional Lead data.** The My Domain hostname cannot establish that an org is development rather than production. Do not share tokens in ChatGPT or commit them. Salesforce recommends [External Client Apps for new OAuth integrations](https://developer.salesforce.com/docs/platform/api-rest/guide/intro-oauth-and-connected-apps.html).
 
-```bash
-export SIGNALDESK_SF_INSTANCE_URL='https://YOUR-DEV-ORG.my.salesforce.com'
-export SIGNALDESK_SF_ACCESS_TOKEN='LOCALLY_OBTAINED_SHORT_LIVED_TOKEN'
-python -m app.salesforce.read_only_preview
-python -m pytest -q tests/test_salesforce_reader.py
-```
+Use secure environment injection or the in-memory CLI authentication approach in
+[the validation runbook](SALESFORCE_DEV_ORG_VALIDATION.md). Current CLI versions
+mask credentials in `sf org display`; use the dedicated token command captured
+privately in a subprocess. Never paste token literals into shell history.
 
-The `query` endpoint excludes soft-deleted records by default; the contract independently requires an explicit deletion flag. The preview does not persist, update or synchronize CRM records. Live success must be verified before claiming integration. If CRM writes are ever added, fresh authorization, suppression, and duplicate checks must be performed at the point of write.
+The `query` endpoint excludes soft-deleted records by default; the contract independently requires an explicit deletion flag. The preview does not persist, update or synchronize CRM records. The limited live result establishes retrieval and aggregate classification only. If CRM writes are ever added, fresh authorization, suppression, and duplicate checks must be performed at the point of write.
 
 ## Customer acceptance criteria
 
 | Test | Acceptance requirement | Current status |
 |---|---|---|
-| Suppression | Email opt-out, Do Not Call and deleted flags block an assessed lead | Offline unit tests |
+| Suppression | Email opt-out, Do Not Call and deleted flags block an assessed lead | Offline tests; email opt-out also matched in live aggregate on 2026-11-08; Do Not Call/deletion not live-tested |
 | Missing fields | Missing/invalid required fields result in HOLD, not presumed permission | Offline unit tests |
-| Evidence | CRM selection alone cannot approve outreach or establish company fit | Contract design; live integration pending |
-| Access | Authenticated Salesforce integration uses restricted scopes and field-level access | Offline tested read-only REST client; OAuth configuration and live scope verification pending |
+| Evidence | CRM selection alone cannot approve outreach or establish company fit | Contract design; live preview reported zero approval grants |
+| Access | Authenticated Salesforce integration uses restricted scopes and field-level access | Operator authenticated; Lead describe reported queryable=true and createable/updateable/deletable=false; not an all-object/scope audit |
 | Reconciliation | Fresh suppression/duplicate check before an authorized CRM write | Not implemented |
 | Reliability | Record observable latency, failures, fallbacks and request costs | Not implemented |
 | Governance | Exact reviewer, purpose and approved content logged for any consequential action | Existing SignalDesk local boundary; live CRM pending |
@@ -98,9 +96,18 @@ Define **B** as current manual research minutes per lead, **A** as reviewed AI-a
 5. **Commercialize:** Build TCO and sensitivity ranges; clearly separate modeled benefits from observed outcomes.
 6. **Deliver:** Present phased implementation, security workstream, change management, acceptance tests, and executive recommendation.
 
-**Next engineering gate:** Configure least-privilege OAuth in a development org, verify a live read-only retrieval against fictional records, and reconcile actual schema and permissions before considering CRM changes.
+**Next engineering gate:** complete remaining live negative cases, capture reproducible run metadata, and define pilot measurement and monitoring before expanding integration scope.
 
-**Portfolio claim:** "Designed and tested an offline Salesforce suppression-safe qualification contract and a bounded read-only REST client, with a client discovery and proof-of-value plan." No live-org claim yet. **Do not claim a working Salesforce or Agentforce integration until one has been built and verified.**
+**Portfolio claim:** "Implemented a bounded Salesforce read-only reader and completed an operator-run Developer Edition validation using two synthetic Leads: one blocked and one requiring review, with reported read-only Lead permissions." This is not production deployment, Agentforce validation, outreach authorization or measured ROI.
 
+## Case-review framing
+
+**Salesforce × SignalDesk: Evaluating AI-Assisted Lead Research Under Enterprise Controls.**
+
+Decision: should a sales organization advance from technical proof of value to a
+controlled pilot, and what additional evidence should leadership require?
+The live reader uses deterministic classification; it does not run AI research.
+Research productivity, reviewer acceptance and cost per reviewed lead are pilot
+measurement proposals, not achieved benefits.
 
 [Development-org validation runbook](SALESFORCE_DEV_ORG_VALIDATION.md) · [TAGM Client-to-Value Studio](TAGM_CLIENT_TO_VALUE_STUDIO.md)

@@ -1,8 +1,77 @@
 # Salesforce development-org validation runbook
 
-**Status: prepared, not executed against a live Salesforce org.**
+**Status: limited live validation completed on November 8, 2026; remaining live negative cases pending.**
 This runbook validates the existing read-only client. It does not configure
 Agentforce, connect the research queue, write CRM records or send messages.
+
+## Live evidence — November 8, 2026
+
+On November 8, 2026, Tracy Manning ran the reader locally against two synthetic Leads in a Salesforce Developer Edition org: **2 assessed, 1 blocked, 1 review-required, 0 held**. The preview reported zero CRM writes, approval grants and outreach. A separate Lead describe check reported queryable=true and createable/updateable/deletable=false. These are operator-supplied live results, not agent-executed tests or a production audit.
+
+### Provenance and scope
+
+The operator ran commands on her Mac after pulling the Salesforce reader changes
+and shared terminal output for review. Exact execution time, local commit SHA,
+Python version and shell exit status were not captured. No automated-test rerun
+is inferred from this live session.
+
+A separate query verified one fictional Lead had HasOptedOutOfEmail=true and the
+other false; both had DoNotCall=false. Prior queries showed example.com websites
+and IsDeleted=false. Aggregate reader counts matched that controlled dataset.
+The output does not attribute decisions to individual record IDs.
+
+```json
+{
+  "source": "salesforce_rest_read_only",
+  "records_assessed": 2,
+  "review_required": 1,
+  "blocked": 1,
+  "held": 0,
+  "crm_writes": 0,
+  "approval_grants": 0,
+  "outreach_sent": 0,
+  "disclaimer": "Not proof of verified lead fit, CRM write permission, or customer ROI."
+}
+```
+
+The operator separately ran `sf sobject describe --sobject Lead --target-org signaldesk-preview --json`:
+
+| Lead capability | Observed |
+|---|---|
+| queryable | true |
+| createable | false |
+| updateable | false |
+| deletable | false |
+
+No write was attempted. Describe metadata establishes reported Lead object
+capabilities for that identity at that time, not a negative write test or an
+all-object permissions audit. Zero-action counters are preview-reported, not
+independent Salesforce audit logs. Review-required does not grant outreach consent.
+
+**Passed:** the limited live-read and email opt-out milestone, plus reported
+read-only Lead permissions. Production readiness, research-queue integration,
+Agentforce, broad negative-case coverage and business ROI remain unverified.
+Public evidence omits credentials, org IDs, usernames and CRM record IDs.
+
+### Authentication troubleshooting and repeat-run guidance
+
+The initial wrapper used the masked accessToken value from `sf org display`.
+The reader correctly rejected that value before a CRM read. The successful
+wrapper instead captured JSON from
+`sf org auth show-access-token --target-org signaldesk-preview --json`
+inside a Python subprocess and passed its result.accessToken directly to
+SalesforceReadConfig. The token was not printed or committed.
+
+For repeat runs, first independently confirm the Developer Edition org and
+fictional dataset. Capture `sf org display --json` for the instance URL and
+org-ID check, then use the dedicated token command above with
+`subprocess.run(..., capture_output=True, text=True)`. Check subprocess exit
+codes, retain credentials only in memory, invoke `preview_salesforce_leads`,
+and print only `result.summary()`. Never print raw token-command output.
+Do not strip internal spaces from a masked placeholder or weaken token checks.
+
+References: [Salesforce authentication secrets](https://developer.salesforce.com/docs/platform/sfdx-dev/guide/sfdx-dev-auth-view-secrets.html)
+and [show-access-token](https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_org_auth_show-access-token.html).
 
 ## Prerequisites and stop conditions
 
@@ -49,8 +118,8 @@ do not invalidate expected counts. Do not interpret a sample of 20 as a full aud
 
 | Case | Expected behavior | Evidence class |
 |---|---|---|
-| Eligible fictional lead | review_required; no approval grant | Live validation pending |
-| HasOptedOutOfEmail true | blocked | Live validation pending |
+| Review candidate fictional lead | review_required; no approval grant | Operator-run aggregate matched, 2026-11-08 |
+| HasOptedOutOfEmail true | blocked | Operator-run aggregate matched, 2026-11-08 |
 | DoNotCall true | blocked | Live validation pending |
 | Invalid/missing Website | hold | Live validation pending |
 | Required field inaccessible | Request fails safely or returned incomplete record holds; never inferred permission | Live validation pending |
@@ -58,13 +127,13 @@ do not invalidate expected counts. Do not interpret a sample of 20 as a full aud
 | IsDeleted true | blocked when passed to classifier | Offline only: query excludes soft-deleted Leads |
 | Redirect, malformed JSON, pagination, oversized payload | Whole request rejected | Simulated transport tests |
 | Missing/mismatched totalSize | Rejected before classification | Simulated transport tests |
-| Successful preview | crm_writes, approval_grants and outreach_sent all zero | Verify aggregate output and implementation scope |
+| Successful preview | crm_writes, approval_grants and outreach_sent all zero | Observed preview summary, 2026-11-08 |
 
 Never trigger real rate limits or outages for this pilot. Test those failures with
 the fake transport. Distinguish permissions verified in the org from behavior
 simulated in unit tests.
 
-## Evidence record
+## Evidence template for subsequent runs
 
 Copy this record for each run; leave unexecuted results PENDING.
 
@@ -84,7 +153,7 @@ Copy this record for each run; leave unexecuted results PENDING.
 Capture aggregate counts only in public evidence. Keep tokens, headers, CRM
 response bodies and identifying organization details out of logs and commits.
 
-## Exit gate and accurate claim
+## Broader exit gate and accurate claim
 
 Pass only after the operator and reviewer reconcile fixture expectations,
 suppression behavior and least-privilege access with observed results. Record
@@ -94,7 +163,7 @@ A successful gate supports: "Verified bounded read-only Salesforce Lead retrieva
 in a development org using fictional data." It does not support Agentforce,
 production readiness, CRM synchronization, outreach authorization or measured ROI.
 
-If blocked, retain the current claim: implemented client with offline HTTP tests.
-Resolve the missing org/access prerequisite before repeating the live step.
+The limited live milestone above does not close the remaining negative cases.
+Record subsequent failures and resolve them before repeating a live step.
 
 [Proof-of-value blueprint](SALESFORCE_POV.md) · [TAGM Studio](TAGM_CLIENT_TO_VALUE_STUDIO.md)

@@ -31,8 +31,11 @@ qualified, approved or authorized for outreach.
 Explain the reader's fixed GET, query cap, no redirects, no retries and sanitized
 output. Point to tests for missing fields, inconsistent counts and failed access.
 
-**Live gate:** the Salesforce development account is still pending setup.
-Do not run the live preview or claim authenticated success during this demo.
+**Recorded live evidence:** on November 8, 2026, the operator completed a
+Developer Edition read with 2 synthetic Leads: 1 blocked, 1 review-required,
+0 held. Lead metadata reported query allowed and create/update/delete denied.
+See [provenance and limitations](SALESFORCE_DEV_ORG_VALIDATION.md). This walkthrough
+remains offline; showing recorded evidence is not a new live run.
 Agentforce, CRM writes and delivery are separate, unimplemented integration gates.
 
 ## 5:00–9:00 | AEGIS-NHI risk engagement
@@ -76,8 +79,8 @@ your decision?"
 
 ## 11:00–12:00 | Request a concrete next gate
 
-Revenue: authorize a fictional-data development-org validation after account
-activation, access review and fixture preparation.
+Revenue: review the completed limited live milestone, then authorize remaining
+negative-case tests and define pilot baselines, ownership and acceptance thresholds.
 
 Risk: select one real source schema for an offline adapter design, identify its
 owner and establish the institution/case mapping before any cross-source pilot.
